@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const storeTokens = async (accessToken, refreshToken) => {
   try {
-    await AsyncStorage.setItem('accessToken', accessToken);
-    await AsyncStorage.setItem('refreshToken', refreshToken);
+    await AsyncStorage.setItem('access', accessToken);
+    await AsyncStorage.setItem('refresh', refreshToken);
   } catch (e) {
     console.error("Error al guardar los tokens", e);
   }
@@ -11,7 +11,7 @@ const storeTokens = async (accessToken, refreshToken) => {
 
 const getAccessToken = async () => {
   try {
-    return await AsyncStorage.getItem('accessToken');
+    return await AsyncStorage.getItem('access');
   } catch (e) {
     console.error("Error al obtener el access token", e);
   }
@@ -20,7 +20,7 @@ const getAccessToken = async () => {
 
 const getRefreshToken = async () => {
   try {
-    return await AsyncStorage.getItem('refreshToken');
+    return await AsyncStorage.getItem('refresh');
   } catch (e) {
     console.error("Error al obtener el refresh token", e);
   }
@@ -29,8 +29,8 @@ const getRefreshToken = async () => {
 
 const clearTokens = async () => {
   try {
-    await AsyncStorage.removeItem('accessToken');
-    await AsyncStorage.removeItem('refreshToken');
+    await AsyncStorage.removeItem('access');
+    await AsyncStorage.removeItem('refresh');
   } catch (e) {
     console.error("Error al borrar los tokens", e);
   }

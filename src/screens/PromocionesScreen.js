@@ -4,13 +4,12 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  Alert,
   TouchableOpacity,
 } from "react-native";
-import { obtenerPromociones, togglePromocion } from "../services/api";
 import { useFocusEffect } from "@react-navigation/native";
 import { logout } from "../services/auth";
 import Icon from "react-native-vector-icons/Ionicons";
+import { fetchPromocionesPorRol, cambiarEstadoPromocion } from "../utils/promoHelpers";
 
 const PromocionesScreen = ({ navigation, route }) => {
   const { role, token } = route.params || {}; // Recibir el rol del usuario (admin o mesero)
@@ -27,14 +26,12 @@ const PromocionesScreen = ({ navigation, route }) => {
     useCallback(() => {
       const fetchPromociones = async () => {
         try {
-          const data = await obtenerPromociones(token, role);
-          const filteredPromos =
-            role === "mesero" ? data.filter((promo) => promo.activa) : data;
-          setPromociones(filteredPromos);
+          const data = await fetchPromocionesPorRol(token, role);
+          setPromociones(data);
         } catch (error) {
           console.error("Error al obtener promociones:", error);
         }
-      };
+      };      
       fetchPromociones();
     }, [role])
   );
@@ -53,15 +50,7 @@ const PromocionesScreen = ({ navigation, route }) => {
 
   const handleTogglePromocion = async (id, estadoActual) => {
     try {
-      await togglePromocion(id, estadoActual);
-      Alert.alert(
-        "Éxito",
-        `Promoción ${estadoActual ? "desactivada" : "activada"} correctamente.`
-      );
-      const updatedPromos = promociones.map((promo) =>
-        promo.id === id ? { ...promo, activa: !estadoActual } : promo
-      );
-      setPromociones(updatedPromos);
+      await cambiarEstadoPromocion(id, estadoActual, promociones, setPromociones);
     } catch (error) {
       console.error("Error al cambiar el estado de la promocion:", error);
     }

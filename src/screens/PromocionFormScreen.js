@@ -1,54 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { View, TextInput, Button, StyleSheet, Alert } from "react-native";
-import {
-  agregarPromocion,
-  editarPromocion,
-  obtenerPromocionPorId,
-} from "../services/api";
+import React from "react";
+import { View, TextInput, Button, StyleSheet } from "react-native";
+import { usePromocionForm } from "../hooks/usePromocionForm"; 
 
 const PromocionFormScreen = ({ route, navigation }) => {
-  const { promocionId } = route.params || {}; // Recibe el ID de la promoción si es edición
-  const [nombre, setNombre] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [activa, setActiva] = useState(true);
-
-  useEffect(() => {
-    if (promocionId) {
-      // Si estamos editando, obtenemos los datos de la promoción
-      const fetchPromocion = async () => {
-        try {
-          const promocion = await obtenerPromocionPorId(promocionId);
-          setNombre(promocion.nombre);
-          setDescripcion(promocion.descripcion);
-          setActiva(promocion.activa);
-        } catch (error) {
-          console.error("Error al obtener la promoción:", error);
-        }
-      };
-      fetchPromocion();
-    }
-  }, [promocionId]);
-
-  const handleSubmit = async () => {
-    try {
-      const promocion = { nombre, descripcion, activa };
-
-      if (promocionId) {
-        // Si hay ID, estamos editando
-        await editarPromocion(promocionId, promocion);
-        Alert.alert("Éxito", "Promoción actualizada correctamente");
-      } else {
-        // Si no hay ID, estamos agregando una nueva promoción
-        await agregarPromocion(promocion);
-        Alert.alert("Éxito", "Promoción creada correctamente");
-      }
-
-      navigation.goBack(); // Regresa a la lista de promociones
-    } catch (error) {
-      Alert.alert("Error", "Hubo un problema al guardar la promoción.");
-      console.error("Error al guardar promoción:", error);
-    }
-  };
+  const promocionId = route.params?.promocionId;
+  const {
+    nombre,
+    setNombre,
+    descripcion,
+    setDescripcion,
+    handleSubmit,
+  } = usePromocionForm(promocionId, navigation);
 
   return (
     <View style={styles.container}>

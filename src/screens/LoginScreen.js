@@ -9,50 +9,17 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-import { iniciarSesion } from "../services/api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { loginUser } from "../utils/authHelpers";
+import CustomInput from "../components/CustomInput";
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async () => {
-    if (!username || !password) {
-      Alert.alert("Error", "Por favor, completa todos los campos.");
-      return;
-    }
-  
-    setLoading(true);
-    try {
-      const { access, refresh, role } = await iniciarSesion({ username, password });
-  
-      if (!role) {
-        Alert.alert("Error", "El rol no está definido.");
-        return;
-      }
-  
-      // Ya los guardaste en iniciarSesion, pero si quieres guardar role también:
-      await AsyncStorage.setItem('role', role);
-  
-      if (role === "admin") {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "AdminDashboard", params: { role, token: access } }],
-        });
-      } else if (role === "mesero") {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "MeseroDashboard", params: { role, token: access } }],
-        });
-      }
-    } catch (error) {
-      const errorMessage = error.response?.data?.error || "No se pudo conectar con el servidor.";
-      Alert.alert("Error", errorMessage);
-      console.error("Error en login:", error);
-    } finally {
-      setLoading(false);
-    }
+  const handleLogin = () => {
+    loginUser({ username, password, navigation, onLoading: setLoading });
   };
 
   return (
@@ -63,20 +30,19 @@ const LoginScreen = ({ navigation }) => {
       </Text>
       <Text style={styles.title}>Promociones de racha 🔥</Text>
 
-      <TextInput
+      <CustomInput
         placeholder="Usuario"
-        placeholderTextColor="#aaa"
         value={username}
         onChangeText={setUsername}
-        style={styles.input}
       />
-      <TextInput
+
+      <CustomInput
         placeholder="Contraseña"
-        placeholderTextColor="#aaa"
         value={password}
-        secureTextEntry
         onChangeText={setPassword}
-        style={styles.input}
+        secureTextEntry={!showPassword}
+        showToggle
+        onTogglePress={() => setShowPassword(!showPassword)}
       />
 
       <TouchableOpacity

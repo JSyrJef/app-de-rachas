@@ -152,13 +152,23 @@ export const verificarPromociones = async (usuarioTikTok) => {
 export const obtenerNuevoAccessToken = async () => {
   const refreshToken = await getRefreshToken();
   if (!refreshToken) throw new Error("No hay refresh token disponible");
+
   try {
     const response = await API.post("/token/refresh/", { refresh: refreshToken });
+
     const newAccessToken = response.data.access;
-    await storeTokens(newAccessToken, refreshToken); // Guardar el nuevo access token
+    const newRefreshToken = response.data.refresh; // Si la API devuelve un nuevo refresh token
+
+    if (!newAccessToken) {
+      throw new Error("No se obtuvo un nuevo access token.");
+    }
+
+    await storeTokens(newAccessToken, newRefreshToken || refreshToken); // Almacena el nuevo access token y refresh token (si disponible)
+    
     return newAccessToken;
   } catch (error) {
     console.error("Error al obtener nuevo access token:", error);
-    throw new Error ('Error al renovar el token');
+    throw new Error('Error al renovar el token');
   }
 };
+
