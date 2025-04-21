@@ -17,6 +17,7 @@ export const loginUser = async ({ username, password, navigation, onLoading }) =
     }
 
     await AsyncStorage.setItem("role", role);
+    await AsyncStorage.setItem("access", access);
 
     const screen = role === "admin" ? "AdminDashboard" : "MeseroDashboard";
     navigation.reset({ index: 0, routes: [{ name: screen, params: { role, token: access } }] });
